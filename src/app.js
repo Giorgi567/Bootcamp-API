@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const bootcampRoutes = require("./routes/bootcamps.js");
 const morgan = require("morgan");
-const colors = require("colors");
+const errorHandler = require("./middleware/error.js");
 dotenv.config({ path: "./config/config.env" });
 const connectDB = require("./config/db.js");
 
@@ -18,6 +18,8 @@ if (process.env.NODE_ENV === "development") {
 connectDB();
 
 app.use("/api/v1/bootcamps", bootcampRoutes);
+
+app.use(errorHandler);
 
 app.listen(process.env.PORT || 2000, () => {
   console.log(
