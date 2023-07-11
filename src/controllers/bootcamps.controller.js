@@ -1,6 +1,8 @@
 const Bootcamp = require("../models/bootcamp.model.js");
 const errorResponse = require("../utils/errorResponse.js");
 const asyncHandler = require("../middleware/async.js");
+const Courses = require("../models/course.model.js");
+const path = require("path");
 // @desc  Get All BootCamps
 // @route Get /api/bootcamps
 // @access Public
@@ -20,7 +22,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     (match) => `$${match}`
   );
 
-  query = Bootcamp.find(JSON.parse(queryStr));
+  query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
 
   if (req.query.select) {
     const fields = req.query.select.split(",").join(" ");
@@ -64,7 +66,12 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   }
 
   if (!bootcamps) {
-    return res.status(400).json({ success: false });
+    return next(
+      new errorResponse(
+        `Could not find bootcamp with this ID ${req.params.id}`,
+        404
+      )
+    );
   }
   res.status(200).json({
     success: true,
@@ -81,9 +88,11 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.id);
 
   if (!bootcamp) {
-    return new errorResponse(
-      `Could not find bootcamp with id of ${req.params.id}`,
-      404
+    return next(
+      new errorResponse(
+        `Could not find bootcamp with this ID ${req.params.id}`,
+        404
+      )
     );
   }
 
@@ -110,7 +119,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   );
 
   if (!updatedBootcamp) {
-    return res.status(400).json({ success: false });
+    return next(new errorResponse("Bootcamp not found", 404));
   }
 
   res.status(200).json({ success: true, Data: updatedBootcamp });
@@ -120,11 +129,56 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @route Delete /api/bootcamps/:id
 // @access Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const requestedBootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
-
+  const requestedBootcamp = await Bootcamp.findById(req.params.id);
   if (!requestedBootcamp) {
-    return res.status(400).json({ success: false });
+    return next(new errorResponse("Bootcamp not found", 404));
   }
 
+  await Courses.deleteMany({ bootcamp: requestedBootcamp._id });
+  await Bootcamp.findByIdAndDelete(requestedBootcamp._id);
+
   res.status(200).json({ success: true });
+});
+
+// @desc  Upload Photo for bootcamp
+// @route put /api/bootcamps/:id/photo
+// @access Private
+exports.bootcampFotoUpload = asyncHandler(async (req, res, next) => {
+  const requestedBootcamp = await Bootcamp.findById(req.params.id);
+
+  if (!requestedBootcamp) {
+    return next(new errorResponse("Bootcamp not found", 404));
+  }
+
+  if (!req.files) {
+    return next(new errorResponse("Please upload a file", 400));
+  }
+
+  const file = req.files.file;
+
+  if (!file.mimetype.startsWith("image")) {
+    return next(new errorResponse(`Please upload a image file`, 400));
+  }
+
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new errorResponse(
+        `Please upload an image less then ${process.env.MAX_FILE_UPLOAD}`,
+        400
+      )
+    );
+  }
+
+  file.name = `Photo_${requestedBootcamp._id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.log(err);
+      return next(
+        new errorResponse(`Bumped into a problem while uploading file`, 500)
+      );
+    }
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
+    res.status(200).json({ success: true, data: file.name });
+  });
 });

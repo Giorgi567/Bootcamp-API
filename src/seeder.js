@@ -3,6 +3,7 @@
 // To import data type "node seeder -i" in Terminal
 // To delete data type "node seeder -d" in Terminal
 // MAKE SURE THAT YOU ARE INSIDE OF A SRC DIRECTORY
+// If while importing there was timeoute errors just comment out 28 and 29-th lines of code and import it one by one instead of all at once
 
 const fs = require("fs");
 const mongoose = require("mongoose");
@@ -24,14 +25,15 @@ const courses = JSON.parse(
 
 const importData = async () => {
   try {
-    await Bootcamp.create(bootcamps);
+    // await Bootcamp.create(bootcamps);
     await Course.create(courses);
 
-    console.log(`${bootcamps.length} bootcamp documents imported`.green);
-    console.log(`${courses.length} course documents imported`.green);
+    console.log(` bootcamp documents imported`.green);
+    console.log(` course documents imported`.green);
     process.exit();
   } catch (err) {
     console.error(err);
+    process.exit();
   }
 };
 
@@ -42,7 +44,8 @@ const deleteData = async () => {
     console.log(`Data Destroyed`.red);
     process.exit();
   } catch (err) {
-    console.err(err);
+    console.log(err);
+    process.exit();
   }
 };
 
