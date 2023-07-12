@@ -8,9 +8,16 @@ const {
   bootcampFotoUpload,
 } = require("../controllers/bootcamps.controller");
 const { getBootcampCourses } = require("../controllers/course.controller");
+
+const bootcampModel = require("../models/bootcamp.model");
+const advancedResults = require("../middleware/advancedFiltering");
+
 const router = express.Router();
 
-router.route("/").get(getBootcamps).post(createBootacmp);
+router
+  .route("/")
+  .get(advancedResults(bootcampModel, "courses"), getBootcamps)
+  .post(createBootacmp);
 
 router
   .route("/:id")

@@ -8,16 +8,7 @@ const Bootcamp = require("../models/bootcamp.model.js");
 // @Access: Public
 
 exports.getCourses = asyncHandler(async (req, res, next) => {
-  const courses = await Course.find().populate({
-    path: "bootcamp",
-    select: "name description",
-  });
-
-  res.status(200).json({
-    success: true,
-    bootcamCount: courses.length,
-    courses,
-  });
+  res.status(200).json(res.advancedResults);
 });
 
 // @Routes: Get /api/v1/bootcamps/:bootcampId/courses
@@ -34,6 +25,7 @@ exports.getBootcampCourses = asyncHandler(async (req, res, next) => {
       `Can not find Bootcamp with the id of ${req.params.bootcampId}`
     );
   }
+
   res.status(200).json({
     success: true,
     bootcamCount: CourseBootcamps.length,
