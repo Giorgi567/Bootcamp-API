@@ -4,14 +4,14 @@ const asyncHandler = require("../middleware/async.js");
 const Courses = require("../models/course.model.js");
 const path = require("path");
 // @desc  Get All BootCamps
-// @route Get /api/bootcamps
+// @route Get /api/v1/bootcamps
 // @access Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
 });
 
 // @desc  Get  BootCamp
-// @route Get /api/bootcamps/:id
+// @route Get /api/v1/bootcamps/:id
 // @access Public
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.id);
@@ -29,7 +29,7 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 // @desc  Create  BootCamp
-// @route Post /api/bootcamps
+// @route Post /api/v1/bootcamps
 // @access Private
 exports.createBootacmp = asyncHandler(async (req, res, next) => {
   const newBootcamp = await Bootcamp.create(req.body);
@@ -38,7 +38,7 @@ exports.createBootacmp = asyncHandler(async (req, res, next) => {
 });
 
 // @desc  Update  BootCamp
-// @route Put /api/bootcamps/:id
+// @route Put /api/v1/bootcamps/:id
 // @access Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   const updatedBootcamp = await Bootcamp.findByIdAndUpdate(
@@ -55,7 +55,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 // @desc  Delete  BootCamp
-// @route Delete /api/bootcamps/:id
+// @route Delete /api/v1/bootcamps/:id
 // @access Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const requestedBootcamp = await Bootcamp.findById(req.params.id);
@@ -70,7 +70,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 // @desc  Upload Photo for bootcamp
-// @route put /api/bootcamps/:id/photo
+// @route put /api/v1/bootcamps/:id/photo
 // @access Private
 exports.bootcampFotoUpload = asyncHandler(async (req, res, next) => {
   const requestedBootcamp = await Bootcamp.findById(req.params.id);
