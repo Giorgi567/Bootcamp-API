@@ -5,6 +5,8 @@ const morgan = require("morgan");
 const errorHandler = require("./middleware/error.js");
 const path = require("path");
 const connectDB = require("./config/db.js");
+const cookieParser = require("cookie-parser");
+
 dotenv.config({ path: "./config/config.env" });
 
 // ------------------Route Files -------------------------//
@@ -17,6 +19,9 @@ const app = express();
 
 // Parses data comming from body
 app.use(express.json());
+
+// Cookie-Parser
+app.use(cookieParser());
 
 // Getting request type url statuscode and time it took
 if (process.env.NODE_ENV === "development") {

@@ -95,6 +95,12 @@ const BootCampSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+
+    User: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     toJSON: { virtuals: true },
