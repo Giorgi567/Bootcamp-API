@@ -1,13 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config({ path: "./config/config.env" });
 const fileUpload = require("express-fileupload");
 const morgan = require("morgan");
 const errorHandler = require("./middleware/error.js");
 const path = require("path");
 const connectDB = require("./config/db.js");
 const cookieParser = require("cookie-parser");
-
-dotenv.config({ path: "./config/config.env" });
 
 // ------------------Route Files -------------------------//
 const bootcampRoutes = require("./routes/bootcamps.routes.js");
