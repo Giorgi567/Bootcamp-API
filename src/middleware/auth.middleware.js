@@ -5,7 +5,6 @@ const asyncHandlerMiddleWare = require("./async");
 
 exports.protect = asyncHandlerMiddleWare(async (req, res, next) => {
   let token;
-
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -19,9 +18,9 @@ exports.protect = asyncHandlerMiddleWare(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
 
     req.user = await User.findById(decoded.id);
+
     next();
   } catch (error) {
     return next(new errorResponse("Not authorized to this route", 401));
@@ -31,6 +30,8 @@ exports.protect = asyncHandlerMiddleWare(async (req, res, next) => {
 exports.Authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
+      console.log(`Auth`);
+
       return next(
         new errorResponse(
           `User role ${req.user.role} is not authorized to access this route`,

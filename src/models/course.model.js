@@ -36,6 +36,11 @@ const courseSchema = new Schema({
     ref: "Bootcamp",
     required: true,
   },
+  User: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 courseSchema.statics.getAverageCost = async function (bootcampId) {
@@ -61,10 +66,6 @@ courseSchema.statics.getAverageCost = async function (bootcampId) {
 };
 
 courseSchema.post("save", function () {
-  this.constructor.getAverageCost(this.bootcamp);
-});
-
-courseSchema.pre("remove", function () {
   this.constructor.getAverageCost(this.bootcamp);
 });
 

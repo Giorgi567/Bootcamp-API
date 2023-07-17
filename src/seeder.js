@@ -30,9 +30,10 @@ const Users = JSON.parse(
 
 const importData = async () => {
   try {
-    // await Bootcamp.create(bootcamps);
-    await Course.create(courses);
-    await User.create(Users);
+    await Bootcamp.create(bootcamps);
+    // await User.create(Users);
+
+    // await Course.create(courses);
 
     console.log(` bootcamp documents imported`.green);
     console.log(` course documents imported`.green);

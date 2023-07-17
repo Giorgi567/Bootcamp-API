@@ -51,17 +51,31 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @Routes: Post /api/v1/courses
+// @Routes: Post /api/v1/:bootcampId/courses
 // @Desc: Creates a single Course
 // @Access: Private
 exports.createCourse = asyncHandler(async (req, res, next) => {
-  const requestedBootcamp = await Bootcamp.findById(req.body.bootcamp);
+  const requestedBootcamp = await Bootcamp.findById(req.params.bootcampId);
+  req.body.bootcamp = req.params.bootcampId;
+  req.body.User = req.user.id;
 
   if (!requestedBootcamp) {
     return new errorResponse(
-      `Can not find Bootcamp with the id of ${req.body.bootcamp}`
+      `Can not find Bootcamp with the id of ${req.body.bootcampId}`
     );
   }
+  if (
+    String(requestedBootcamp.User) !== req.user.id &&
+    req.user.role !== "Admin"
+  ) {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to add a course to bootcamp ${requestedBootcamp.name}`,
+        401
+      )
+    );
+  }
+
   const getCourse = await Course.create(req.body);
 
   res.status(201).json({
@@ -81,6 +95,16 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
       new errorResponse(`Can not find crouse with the id of ${req.params.id}`)
     );
   }
+
+  if (String(currCourse.User) !== req.user.id && req.user.role !== "Admin") {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to Update a course to bootcamp ${currCourse.name}`,
+        401
+      )
+    );
+  }
+
   const getCourse = await Course.findByIdAndUpdate(currCourse._id, req.body, {
     new: true,
     runValidators: true,
@@ -103,7 +127,16 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
       new errorResponse(`Can not find crouse with the id of ${req.params.id}`)
     );
   }
-  reqCourse.remove();
+
+  if (String(reqCourse.User) !== req.user.id && req.user.role !== "Admin") {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to delete a course to bootcamp ${reqCourse.name}`,
+        401
+      )
+    );
+  }
+
   await Course.findByIdAndDelete(reqCourse._id);
 
   res.status(200).json({

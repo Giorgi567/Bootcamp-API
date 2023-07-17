@@ -13,15 +13,16 @@ const { protect, Authorize } = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
+router.route("/").get(
+  advancedResults(CourseModel, {
+    path: "bootcamp",
+    select: "name description",
+  }),
+  getCourses
+);
+
 router
-  .route("/")
-  .get(
-    advancedResults(CourseModel, {
-      path: "bootcamp",
-      select: "name description",
-    }),
-    getCourses
-  )
+  .route("/:bootcampId/course")
   .post(protect, Authorize("Publisher", "Admin"), createCourse);
 
 router

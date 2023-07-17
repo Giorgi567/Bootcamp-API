@@ -55,16 +55,28 @@ exports.createBootacmp = asyncHandler(async (req, res, next) => {
 // @route Put /api/v1/bootcamps/:id
 // @access Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-  const updatedBootcamp = await Bootcamp.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true, runValidators: true }
-  );
+  let updatedBootcamp = await Bootcamp.findById(req.params.id);
 
   if (!updatedBootcamp) {
     return next(new errorResponse("Bootcamp not found", 404));
   }
 
+  if (
+    String(updatedBootcamp.User) !== req.user.id &&
+    req.user.role !== "Admin"
+  ) {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to update this bootcamp`,
+        401
+      )
+    );
+  }
+
+  updatedBootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
   res.status(200).json({ success: true, Data: updatedBootcamp });
 });
 
@@ -75,6 +87,18 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const requestedBootcamp = await Bootcamp.findById(req.params.id);
   if (!requestedBootcamp) {
     return next(new errorResponse("Bootcamp not found", 404));
+  }
+
+  if (
+    String(requestedBootcamp.User) !== req.user.id &&
+    req.user.role !== "Admin"
+  ) {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to delete this bootcamp`,
+        401
+      )
+    );
   }
 
   await Courses.deleteMany({ bootcamp: requestedBootcamp._id });
@@ -93,6 +117,17 @@ exports.bootcampFotoUpload = asyncHandler(async (req, res, next) => {
     return next(new errorResponse("Bootcamp not found", 404));
   }
 
+  if (
+    String(requestedBootcamp.User) !== req.user.id &&
+    req.user.role !== "Admin"
+  ) {
+    return next(
+      new errorResponse(
+        `User ${req.user.name} is not authorized to update this bootcamp`,
+        401
+      )
+    );
+  }
   if (!req.files) {
     return next(new errorResponse("Please upload a file", 400));
   }
