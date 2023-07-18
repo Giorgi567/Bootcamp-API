@@ -12,7 +12,7 @@ const cookieParser = require("cookie-parser");
 const bootcampRoutes = require("./routes/bootcamps.routes.js");
 const courseRouter = require("./routes/courses.routes.js");
 const authRouter = require("./routes/auth.routes.js");
-
+const adminUserRoutes = require("./routes/users.routes.js");
 // app
 const app = express();
 
@@ -39,6 +39,7 @@ connectDB();
 // Mount Routers
 app.use("/api/v1/bootcamps", bootcampRoutes);
 app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1/auth/users", adminUserRoutes);
 app.use("/api/v1/auth", authRouter);
 
 // eroor handling for commmon errors
