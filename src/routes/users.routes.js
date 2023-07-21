@@ -1,6 +1,5 @@
 const express = require("express");
 const User = require("../models/User.model");
-const {} = require("../controllers/auth.controller");
 const { protect, Authorize } = require("../middleware/auth.middleware");
 const {
   getUsers,

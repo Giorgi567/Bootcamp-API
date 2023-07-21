@@ -30,8 +30,6 @@ exports.protect = asyncHandlerMiddleWare(async (req, res, next) => {
 exports.Authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      console.log(`Auth`);
-
       return next(
         new errorResponse(
           `User role ${req.user.role} is not authorized to access this route`,
